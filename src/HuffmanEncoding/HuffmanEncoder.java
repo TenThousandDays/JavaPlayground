@@ -28,6 +28,11 @@ public class HuffmanEncoder {
         return params;
     }
 
+    private static double getCompressionRatio(String rawData, String encodedData){
+        double encodedCharCount = (double)encodedData.length() / 8;
+        return (double)rawData.length() / encodedCharCount;
+    }
+
     public static void encode(String filename){
         if(!filename.endsWith(".txt")) throw new IllegalArgumentException("Only plaintext (.txt) can be encoded!");
         String data = FileHelper.readFromFile(filename);
@@ -37,17 +42,20 @@ public class HuffmanEncoder {
         BinaryTree huffmanTree = HuffmanHelper.getHuffmanCodeTree(
                 HuffmanHelper.getQueueFromHuffmanTable(
                         HuffmanHelper.makeHuffmanTable(data)));
-        String[] codeTable = new String[256];
+//        String[] codeTable = new String[256];
+        HashMap<Character, String> codeTable = new HashMap<>();
         HuffmanHelper.fillCodeTable(codeTable, huffmanTree.root(), "", "");
         StringBuilder output = new StringBuilder();
         for(char i : data.toCharArray()){
-            output.append(codeTable[i]);
+            output.append(codeTable.get(i));
         }
         String fn_prefix = filename.split("\\.")[0];
         String out_fn =  fn_prefix + ".huff";
         String table_out_fn = fn_prefix + ".table";
         FileHelper.writeToFile(out_fn, output.toString());
         HuffmanHelper.exportCodeTable(codeTable, table_out_fn);
+        System.out.println("Compression ratio: " + getCompressionRatio(data, output.toString()));
+        System.out.println("Saved encoded data to " + out_fn);
     }
 
     public static void decode(String filename){
@@ -70,6 +78,7 @@ public class HuffmanEncoder {
         }
         String output_fn = fn_prefix + ".decoded.txt";
         FileHelper.writeToFile(output_fn, plaintext.toString());
+        System.out.println("Saved decoded data to " + output_fn);
     }
 
     public static void main(String[] args){
