@@ -38,9 +38,9 @@ public class HuffmanHelper {
         }
     }
 
-    public static void fillCodeTable(String[] codeTable, Node node, String code, String appendix){
+    public static void fillCodeTable(HashMap<Character, String> codeTable, Node node, String code, String appendix){
         if(node.isLeaf()){
-            codeTable[node.getLetter()] = code + appendix;
+            codeTable.put(node.getLetter(), code + appendix);
         }
         else{
             fillCodeTable(codeTable, node.getLeft(), code + appendix, "0");
@@ -54,7 +54,8 @@ public class HuffmanHelper {
                 (new InputStreamReader(new FileInputStream(table_fn), StandardCharsets.UTF_8))){
             String line = reader.readLine();
             while(line != null){
-                Character letter = line.split(" : ")[0].charAt(0);
+                String letter_code = line.split(" : ")[0].replaceFirst("0x", "");
+                Character letter = (char)Integer.parseInt(letter_code, 16);
                 String code = line.split(" : ")[1];
                 decode_table.put(code, letter);
                 line = reader.readLine();
@@ -66,11 +67,13 @@ public class HuffmanHelper {
         return decode_table;
     }
 
-    public static void exportCodeTable(String[] table, String filename){
+    public static void exportCodeTable(HashMap<Character, String> table, String filename){
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(filename))){
+            String hex_repro;
             for(int i = 0; i < 256; i++){
-                if(table[i] != null){
-                    writer.write((char)i + " : " + table[i]);
+                if(table.get((char)i) != null){
+                    hex_repro = String.format("0x%02X", i);
+                    writer.write(hex_repro + " : " + table.get((char)i));
                     writer.newLine();
                 }
             }
