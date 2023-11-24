@@ -68,12 +68,16 @@ public class HuffmanEncoder {
             throw new RuntimeException("Can't decode null-data!");
         }
         StringBuilder plaintext = new StringBuilder();
+        double encoded_length = encoded_data.length();
+        double current_length;
         while(encoded_data.length() > 0){
             for(String code : code_table.keySet()){
+                current_length = encoded_data.length();
                 if(encoded_data.startsWith(code)){
                     plaintext.append(code_table.get(code));
                     encoded_data = encoded_data.replaceFirst(code, "");
                 }
+                System.out.printf("%.2f%% decode left\r", current_length / encoded_length * 100);
             }
         }
         String output_fn = fn_prefix + ".decoded.txt";
