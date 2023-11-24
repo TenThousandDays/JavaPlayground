@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
-class HuffmanHelper {
+public class HuffmanHelper {
     public static HashMap<Character, Integer> makeHuffmanTable(String data){
         HashMap<Character, Integer> table = new HashMap<>();
         for(char i : data.toCharArray()){

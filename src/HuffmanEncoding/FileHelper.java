@@ -3,7 +3,7 @@ package HuffmanEncoding;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-class FileHelper {
+public class FileHelper {
 
     public static String readFromFile(String filename){
         try(BufferedReader reader = new BufferedReader

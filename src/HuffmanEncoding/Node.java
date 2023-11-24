@@ -1,6 +1,6 @@
 package HuffmanEncoding;
 
-class Node{
+public class Node{
     private int frequence;
     private char letter;
     private Node left;
