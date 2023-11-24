@@ -1,16 +1,15 @@
 package HuffmanEncoding;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class FileHelper {
-
     public static String readFromFile(String filename){
-        try(BufferedReader reader = new BufferedReader
-                (new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8))){
-            return reader.readLine();
+        try{
+            return Files.readString(Paths.get(filename));
         }
-        catch (IOException e){
+        catch (java.io.IOException e){
             System.err.println("Read from file error!");
         }
         return null;
