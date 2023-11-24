@@ -15,7 +15,7 @@ public class HuffmanHelper {
     }
 
     public static PriorityQueue<BinaryTree> getQueueFromHuffmanTable(HashMap<Character, Integer> table){
-        PriorityQueue<BinaryTree> queue = new PriorityQueue<>(256, new BinaryTreeComparator());
+        PriorityQueue<BinaryTree> queue = new PriorityQueue<>(new BinaryTreeComparator());
         for(Character c : table.keySet()){
             queue.add(new BinaryTree(new Node(table.get(c), c)));
         }
@@ -70,9 +70,9 @@ public class HuffmanHelper {
     public static void exportCodeTable(HashMap<Character, String> table, String filename){
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(filename))){
             String hex_repro;
-            for(int i = 0; i < 256; i++){
+            for(int i = 0; i < 65536; i++){
                 if(table.get((char)i) != null){
-                    hex_repro = String.format("0x%02X", i);
+                    hex_repro = String.format("0x%04X", i);
                     writer.write(hex_repro + " : " + table.get((char)i));
                     writer.newLine();
                 }
