@@ -8,9 +8,9 @@
 1) Перейти в папку с исходниками, создать папку `out`
 2) `javac -d out *.java`
 3) Перейти в папку со скомпилированными классами: `cd out\HuffmanEncoding`
-4) Собрать jar: `jar cvfe Huffman.jar HuffmanEncoder *`
+4) Собрать jar: `jar cvfe Huffman.jar Main *`
 5) `cd ..`
-6) `java HuffmanEncoding.HuffmanEncoder`
+6) `java HuffmanEncoding.Main`
 
 ### Описание работы программы:
 1) Аргументы командной строки: 
