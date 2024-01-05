@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from tqdm import tqdm
 
 CODE_VALUE_BITS = 16
 TOP_VALUE = (1 << CODE_VALUE_BITS) - 1
@@ -7,7 +8,7 @@ FIRST_QTR = TOP_VALUE // 4 + 1
 HALF = FIRST_QTR * 2
 THIRD_QTR = FIRST_QTR * 3
 
-NO_OF_CHARS = 65536
+NO_OF_CHARS = 256
 EOF_SYMBOL = NO_OF_CHARS
 NO_OF_SYMBOLS = NO_OF_CHARS + 1
 
@@ -93,7 +94,7 @@ class Encoder:
         for i in range(0, NO_OF_CHARS):
             char_to_index[i] = i + 1
             index_to_char[i+1] = i
-        for i in range(0, NO_OF_SYMBOLS):
+        for i in range(0, NO_OF_SYMBOLS + 1):
             freq[i] = 1
             cum_freq[i] = NO_OF_SYMBOLS - i
         freq[0] = 0
@@ -121,12 +122,12 @@ class Encoder:
             i -= 1
             cum_freq[i] += 1
 
-    def encode(self, text: str):
+    def encode(self, text: bytes):
         self.start_model()
         self.start_output_bits()
         self.start_encoding()
-        for c in text:
-            symbol = char_to_index[ord(c)]
+        for c in tqdm(text, ncols=80, desc="Encoding"):
+            symbol = char_to_index[c]
             self.encode_symbol(symbol)
             self.update_model(symbol)
         self.encode_symbol(EOF_SYMBOL)
@@ -147,14 +148,14 @@ class Decoder:
 
     enc_text: bytes = b""
     i: int = 0
-    result: str = ""
+    result: bytes = b""
 
     @staticmethod
     def start_model():
         for i in range(0, NO_OF_CHARS):
             char_to_index[i] = i + 1
             index_to_char[i + 1] = i
-        for i in range(0, NO_OF_SYMBOLS):
+        for i in range(0, NO_OF_SYMBOLS + 1):
             freq[i] = 1
             cum_freq[i] = NO_OF_SYMBOLS - i
         freq[0] = 0
@@ -236,16 +237,18 @@ class Decoder:
         return symbol
 
     def decode(self, enc_text: bytes):
+        total = len(enc_text)
         self.enc_text = enc_text
         self.start_model()
         self.start_input_bits()
         self.start_decoding()
         while True:
+            print(f"Decoding: [{self.i}/{total}]", end="\r")
             symbol = self.decode_symbol()
             if symbol == EOF_SYMBOL:
                 break
             ch = index_to_char[symbol]
-            self.result += chr(ch)
+            self.result += ch.to_bytes(1, "little", signed=False)
             self.update_model(symbol)
 
 
@@ -270,10 +273,10 @@ def writeBytesToFile(filename: str, data: bytes) -> None:
 
 
 if __name__ == "__main__":
-    filename = "eng_text.txt"
+    filename = "book1.txt"
     base_fn = filename.split(".")[0]
 
-    text = readFromFile(filename)
+    text = readBytesFromFile(filename)
 
     enc = Encoder()
     enc.encode(text)
@@ -283,6 +286,5 @@ if __name__ == "__main__":
     dec = Decoder()
     encoded_bytes = readBytesFromFile(f"{base_fn}.ariph")
     dec.decode(encoded_bytes)
-    decoded = dec.result
-    writeToFile(f"{base_fn}.ariph.decoded", decoded)
-    print(f"Decoded data saved to: {base_fn}.ariph.decoded")
+    writeBytesToFile(f"{base_fn}.ariph.decoded", dec.result)
+    print(f"\nDecoded data saved to: {base_fn}.ariph.decoded")
